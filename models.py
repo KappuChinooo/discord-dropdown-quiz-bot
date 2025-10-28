@@ -7,4 +7,4 @@ class Player:
 class Entry:
     def __init__(self, options):
         self.options: list[str] = options
-        self.guesses: dict[int, str] = None
+        self.guesses: dict[int, str] = {}

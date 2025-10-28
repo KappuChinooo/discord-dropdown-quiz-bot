@@ -1,7 +1,7 @@
 from nextcord.ext import commands
 from nextcord import Interaction, SlashOption
 import nextcord
-from ui import SelectAnswerView, make_score_embed, make_guess_embed
+from ui import SelectAnswerView, make_score_embed, make_guess_embed, GuessingView
 from state import ChannelStateManager
 from guess_session import GuessSession
 import models
@@ -25,7 +25,7 @@ class dropdownGuessCog(commands.Cog):
     @nextcord.slash_command(name="create_guess", description="Creates a guess dropdown.")
     async def create_guess(self,
                      interaction: Interaction):
-        session: GuessSession = self.state_manager.get_game(interaction.channel.id)
+        session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
             return
@@ -36,15 +36,15 @@ class dropdownGuessCog(commands.Cog):
         entry = models.Entry(session.options)
 
         embed = make_guess_embed()
-        view = SelectAnswerView(session, entry)
+        view = GuessingView(session, entry)
         await interaction.response.send_message(embed=embed, view=view)
-        message = interaction.original_message()
+        message = await interaction.original_message()
         session.entries[message.id] = entry
 
 
     @nextcord.message_command(name="Score this entry")
     async def do_something_with_message(self, interaction: nextcord.Interaction, message: nextcord.Message):
-        session = self.state_manager.get_game(interaction.channel.id)
+        session = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
             return
@@ -66,19 +66,19 @@ class dropdownGuessCog(commands.Cog):
 
     @nextcord.slash_command(name="scoreboard", description="Sends currenct scoreboard")
     async def scoreboard(self, interaction: Interaction):
-        session: GuessSession = self.state_manager.get_game(interaction.channel.id)
+        session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
             return
         
-        scores = session.get_score()
+        scores = await session.get_score()
 
         embed = make_score_embed(scores)
         await interaction.response.send_message(embed=embed)
 
     @nextcord.slash_command(name="increase_score", description="Increase score of player by some points.")
     async def increase_score(self, interaction: Interaction, user: nextcord.User, points: int):
-        session: GuessSession = self.state_manager.get_game(interaction.channel.id)
+        session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
             return
@@ -91,7 +91,7 @@ class dropdownGuessCog(commands.Cog):
 
     @nextcord.slash_command(name="change_options", description="Change list of option for dropdowns. (comma split)")
     async def change_options(self, interaction: Interaction, choices: str):
-        session: GuessSession = self.state_manager.get_game(interaction.channel.id)
+        session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
             return
@@ -101,10 +101,12 @@ class dropdownGuessCog(commands.Cog):
         
         options = [x.strip() for x in choices.split(",")]
         session.options = options
+        await interaction.response.send_message("Options changed.", ephemeral=True)
+
 
     @nextcord.slash_command(name="end", description="Ends the active scoring session in the current channel.")
     async def end(self, interaction: Interaction):
-        session: GuessSession = self.state_manager.get_game(interaction.channel.id)
+        session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
             return

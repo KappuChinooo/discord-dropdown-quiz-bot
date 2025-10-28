@@ -7,9 +7,9 @@ COLOR = 0x2ab4f2
 class GuessingView(ui.View):
     def __init__(self, session, entry: models.Entry):
         super().__init__(timeout=None)
-        self.add_item(self.GuessDropdown(entry, entry.options))
         self.session = session
         self.entry = entry
+        self.add_item(self.GuessDropdown(session, entry, entry.options))
 
     class GuessDropdown(ui.Select): 
         def __init__(self, session, entry, options_list):
@@ -25,7 +25,7 @@ class GuessingView(ui.View):
         async def callback(self, interaction: Interaction):
             player_id = interaction.user.id
             player_name = interaction.user.name
-            owner_guess = int(self.values[0])
+            owner_guess = self.values[0]
 
             if(player_id not in self.session.players):
                 self.session.players[player_id] = models.Player(player_name)

@@ -8,7 +8,7 @@ class ChannelStateManager:
 
     async def start_session(self, channel_id, owner_id):
         async with self._lock:
-            if(channel_id in self.active_sessiosn):
+            if(channel_id in self.active_sessions):
                 raise ValueError("Channel already has an active game.")
             game = GuessSession(owner_id)
             self.active_sessions[channel_id] = game

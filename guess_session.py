@@ -5,8 +5,8 @@ class GuessSession:
     def __init__(self, owner_id):
         self.owner_id = owner_id
         self.options = None
-        self.players: dict[int, models.Player] = None
-        self.entries: dict[int, models.Entry] = None
+        self.players: dict[int, models.Player] = {}
+        self.entries: dict[int, models.Entry] = {}
         self._lock = asyncio.Lock()
 
     async def score_guesses(self, entry: models.Entry, correct):
