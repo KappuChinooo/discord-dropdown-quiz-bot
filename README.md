@@ -1,6 +1,6 @@
 # Discord dropdown guessing bot
 
-### Description
+## Description
 A Discord bot for interactive guessing games/quizzes using dropdowns. Players can submit guesses, and the bot can automatically score responses, show results, and maintain a scoreboard.
 
 ---
