@@ -11,7 +11,7 @@ class dropdownGuessCog(commands.Cog):
         self.bot = bot
         self.state_manager: ChannelStateManager = state_manager
 
-    @nextcord.slash_command(name="start", description="Start a new guess scoring session.")
+    @nextcord.slash_command(name="start", description="Start a new guess scoring session")
     async def start_session(self,
                          interaction: Interaction):
         channel_id = interaction.channel.id
@@ -23,10 +23,10 @@ class dropdownGuessCog(commands.Cog):
         await interaction.response.send_message("Session started.", ephemeral=True)
         print(f"session started in {channel_id}")
 
-    @nextcord.slash_command(name="create_guess", description="Creates a guess dropdown.")
+    @nextcord.slash_command(name="create_guess", description="Creates a guess dropdown")
     async def create_guess(self,
                      interaction: Interaction,
-                     title: str = SlashOption(description="Enter your question/description here.", required=False, default=None) ):
+                     title: str = SlashOption(description="Guess embed title", required=False, default=None) ):
         session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
@@ -89,8 +89,11 @@ class dropdownGuessCog(commands.Cog):
         embed = make_score_embed(scores)
         await interaction.response.send_message(embed=embed)
 
-    @nextcord.slash_command(name="increase_score", description="Increase score of player by some points.")
-    async def increase_score(self, interaction: Interaction, user: nextcord.User, points: int):
+    @nextcord.slash_command(name="increase_score", description="Increase score of player by some points")
+    async def increase_score(self, 
+                             interaction: Interaction, 
+                             player: nextcord.User = SlashOption(description="Player to increase points", required=True), 
+                             points: int = SlashOption(description="Number of points to increase by", required=True)):
         session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
@@ -99,11 +102,14 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
 
-        await session.increase_score(user.id, points)
+        await session.increase_score(player.id, points)
         await interaction.response.send_message("Score increased.", ephemeral=True)
 
-    @nextcord.slash_command(name="change_score", description="Change score of player to some points.")
-    async def change_score(self, interaction: Interaction, user: nextcord.User, points: int):
+    @nextcord.slash_command(name="change_score", description="Change score of player to some points")
+    async def change_score(self, 
+                           interaction: Interaction, 
+                           player: nextcord.User = SlashOption(description="Player to change points", required=True), 
+                           points: int = SlashOption(description="Number of points to be set", required=True)):
         session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
@@ -112,12 +118,14 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
 
-        await session.change_score(user.id, points)
+        await session.change_score(player.id, points)
         await interaction.response.send_message("Score changed.", ephemeral=True)
 
 
-    @nextcord.slash_command(name="change_options", description="Change list of option for dropdowns. (comma-separated)")
-    async def change_options(self, interaction: Interaction, choices: str):
+    @nextcord.slash_command(name="change_options", description="Change list of option for dropdowns")
+    async def change_options(self, 
+                             interaction: Interaction, 
+                             choices: str = SlashOption(description="comma-separated choices to be used in the next guess", required=True)):
         session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
@@ -132,7 +140,7 @@ class dropdownGuessCog(commands.Cog):
         await interaction.response.send_message("Options changed.", ephemeral=True)
 
 
-    @nextcord.slash_command(name="end", description="Ends the active scoring session in the current channel.")
+    @nextcord.slash_command(name="end", description="Ends the active scoring session in the current channel")
     async def end(self, interaction: Interaction):
         session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
