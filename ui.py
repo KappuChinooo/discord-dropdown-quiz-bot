@@ -32,7 +32,9 @@ class GuessingView(ui.View):
             self.entry.guesses[player_id] = guess
             print(f"{interaction.channel.id}: {player_name} - {guess}")
             names = [self.session.players[id].name for id in self.entry.guesses.keys()]
-            embed = make_guess_embed(names)
+            message = interaction.message
+            title = message.embeds[0].title
+            embed = make_guess_embed(guessed_list=names, title=title)
             await interaction.response.edit_message(embed=embed)
 
 class SelectAnswerView(ui.View):
