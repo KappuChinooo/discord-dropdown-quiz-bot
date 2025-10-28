@@ -34,7 +34,7 @@ A Discord bot for interactive guessing games/quizzes using dropdowns. Players ca
 3. Create a guess dropdown: `/create_guess`
 4. Players select their guesses.
 5. Score entries using the context menu: `Score this entry`
-6. Select the correct answer(s) from the 
+6. Select the correct answer(s) from the dropdown.
 6. View the results and scoreboard: `/scoreboard`
 7. End the session: `/end`
 
