@@ -1,4 +1,4 @@
-from nextcord import ui, Interaction, SelectOption, Embed
+from nextcord import ui, Interaction, SelectOption, Embed, Message
 import models
 from guess_session import GuessSession
 
@@ -31,6 +31,9 @@ class GuessingView(ui.View):
                 self.session.players[player_id] = models.Player(player_name)
             self.entry.guesses[player_id] = guess
             print(f"{interaction.channel.id}: {player_name} - {guess}")
+            names = [self.session.players[id].name for id in self.entry.guesses.keys()]
+            embed = make_guess_embed(names)
+            await interaction.response.edit_message(embed=embed)
 
 class SelectAnswerView(ui.View):
     def __init__(self, entry: models.Entry):
@@ -40,18 +43,27 @@ class SelectAnswerView(ui.View):
 
     class AnswerChoice(ui.Select):
         def __init__(self, entry: models.Entry):
-            super().__init__(placeholder="Select correct answer", options=entry.options)
+            super().__init__(placeholder="Select correct answer", options=[
+                SelectOption(label=f"{item}", value=str(item))
+                for item in entry.options
+            ])
 
-            async def callback(self, interaction: Interaction):
-                self.view.value = self.values[0]
-                print(f"{self.view.value} selected as correct")
-                self.view.stop()
+        async def callback(self, interaction: Interaction):
+            self.view.value = self.values[0]
+            print(f"{self.view.value} selected as correct")
+            self.view.stop()
 
 def make_score_embed(score_list: list[models.Player]):
     embed = Embed(title="Scores:", color=COLOR)
     embed.description = "\n".join(f"**{player.name}:** {player.score}" for player in score_list)
     return embed
 
-def make_guess_embed():
+def make_guess_embed(guessed_list = None):
     embed = Embed(title="Select your guess", color=COLOR)
+    if(guessed_list):
+        embed.description = "\n".join(f"**{player}** submitted" for player in guessed_list)
+    return embed
+
+def make_answer_select_embed():
+    embed = Embed(title="Select the correct answer", color=COLOR)
     return embed

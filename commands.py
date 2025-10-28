@@ -1,7 +1,7 @@
 from nextcord.ext import commands
 from nextcord import Interaction, SlashOption
 import nextcord
-from ui import SelectAnswerView, make_score_embed, make_guess_embed, GuessingView
+from ui import SelectAnswerView, make_score_embed, make_guess_embed, GuessingView, make_answer_select_embed
 from state import ChannelStateManager
 from guess_session import GuessSession
 import models
@@ -58,7 +58,8 @@ class dropdownGuessCog(commands.Cog):
         message_id = message.id
         entry = await session.find_entry(message_id)
         view = SelectAnswerView(entry)
-        await interaction.followup.send(view=view, ephemeral=True)
+        embed = make_answer_select_embed()
+        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
         await view.wait()
         if view.value is None:
             await interaction.followup.send("You didn’t select an answer in time.", ephemeral=True)
