@@ -54,12 +54,11 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
         
-        await interaction.response.defer()
         message_id = message.id
         entry = await session.find_entry(message_id)
         view = SelectAnswerView(entry)
         embed = make_answer_select_embed()
-        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
         await view.wait()
         if view.value is None:
             await interaction.followup.send("You didn’t select an answer in time.", ephemeral=True)
@@ -67,7 +66,6 @@ class dropdownGuessCog(commands.Cog):
         correct = view.value
         await session.score_guesses(entry, correct)
         print(f"{interaction.channel.id}: scored {message_id}")
-        await interaction.followup.send("Points scored.", ephemeral=True)
         
         embed = make_show_answer_embed(session, entry, correct)
         await interaction.followup.send(embed=embed)
