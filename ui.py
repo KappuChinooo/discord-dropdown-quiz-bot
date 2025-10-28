@@ -43,18 +43,19 @@ class SelectAnswerView(ui.View):
 
     class AnswerChoice(ui.Select):
         def __init__(self, entry: models.Entry):
-            super().__init__(placeholder="Select correct answer", options=[
+            options = [
                 SelectOption(label=f"{item}", value=str(item))
                 for item in entry.options
-            ])
+            ]
+            super().__init__(placeholder="Select correct answer", options=options, min_values=1, max_values=len(options))
 
         async def callback(self, interaction: Interaction):
-            self.view.value = self.values[0]
+            self.view.value = self.values
             print(f"{self.view.value} selected as correct")
             self.view.stop()
 
 def make_score_embed(score_list: list[models.Player]):
-    embed = Embed(title="Scores:", color=COLOR)
+    embed = Embed(title="Scores", color=COLOR)
     embed.description = "\n".join(f"**{player.name}:** {player.score}" for player in score_list)
     return embed
 
@@ -66,4 +67,19 @@ def make_guess_embed(guessed_list = None):
 
 def make_answer_select_embed():
     embed = Embed(title="Select the correct answer", color=COLOR)
+    return embed
+
+def make_show_answer_embed(session, entry, correct):
+    embed = Embed(title="Answers", color=COLOR)
+    names = {id: session.players[id].name for id in entry.guesses.keys()}
+    correct_dict = {}
+    for id, guess in entry.guesses.items():
+        if (guess in correct):
+            correct_dict[id] = True
+        else:
+            correct_dict[id] = False
+    embed.description = "Correct Answers: " + ", ".join(correct) + "\n" + "\n".join([
+        f"**{names[id]}** | {'**' + entry.guesses[id] + '**' if correct_dict[id] else entry.guesses[id]}"
+        for id in entry.guesses
+    ])
     return embed

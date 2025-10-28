@@ -12,7 +12,7 @@ class GuessSession:
     async def score_guesses(self, entry: models.Entry, correct):
         async with self._lock:
             for guesser, guess in entry.guesses.items():
-                if(guess == correct):
+                if(guess in correct):
                     try:
                         self.players[guesser].score += 1
                     except:
