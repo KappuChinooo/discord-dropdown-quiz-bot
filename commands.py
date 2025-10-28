@@ -25,7 +25,8 @@ class dropdownGuessCog(commands.Cog):
 
     @nextcord.slash_command(name="create_guess", description="Creates a guess dropdown.")
     async def create_guess(self,
-                     interaction: Interaction):
+                     interaction: Interaction,
+                     title: str = SlashOption(description="Enter your question/description here.", required=False, default=None) ):
         session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
@@ -36,7 +37,7 @@ class dropdownGuessCog(commands.Cog):
         
         entry = models.Entry(session.options)
 
-        embed = make_guess_embed()
+        embed = make_guess_embed(title=title)
         view = GuessingView(session, entry)
         await interaction.response.send_message(embed=embed, view=view)
         print(f"guess created in {interaction.channel.id}")
@@ -115,7 +116,7 @@ class dropdownGuessCog(commands.Cog):
         await interaction.response.send_message("Score changed.", ephemeral=True)
 
 
-    @nextcord.slash_command(name="change_options", description="Change list of option for dropdowns. (comma split)")
+    @nextcord.slash_command(name="change_options", description="Change list of option for dropdowns. (comma-separated)")
     async def change_options(self, interaction: Interaction, choices: str):
         session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):

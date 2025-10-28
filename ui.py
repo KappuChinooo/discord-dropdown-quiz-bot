@@ -59,8 +59,10 @@ def make_score_embed(score_list: list[models.Player]):
     embed.description = "\n".join(f"**{player.name}:** {player.score}" for player in score_list)
     return embed
 
-def make_guess_embed(guessed_list = None):
-    embed = Embed(title="Select your guess", color=COLOR)
+def make_guess_embed(guessed_list = None, title = None):
+    if(title is None):
+        title = "Select your guess"
+    embed = Embed(title=title, color=COLOR)
     if(guessed_list):
         embed.description = "\n".join(f"**{player}** submitted" for player in guessed_list)
     return embed
