@@ -12,11 +12,11 @@ class dropdownGuessCog(commands.Cog):
         self.state_manager: ChannelStateManager = state_manager
 
     @nextcord.slash_command(name="start", description="Start a new guess scoring session.")
-    async def start_game(self,
+    async def start_session(self,
                          interaction: Interaction):
         channel_id = interaction.channel.id
         owner = interaction.user.id
-        if self.state_manager.get_session(channel_id=channel_id):
+        if(self.state_manager.get_session(channel_id=channel_id)):
             await interaction.response.send_message("This channel already has an active session.", ephemeral=True)
             return
         await self.state_manager.start_session(channel_id, owner)

@@ -6,7 +6,7 @@ class ChannelStateManager:
         self.active_sessions = {}
         self._lock = asyncio.Lock()
 
-    async def start_game(self, channel_id, owner_id):
+    async def start_session(self, channel_id, owner_id):
         async with self._lock:
             if channel_id in self.active_games:
                 raise ValueError("Channel already has an active game.")
@@ -14,10 +14,10 @@ class ChannelStateManager:
             self.active_games[channel_id] = game
             return game
         
-    async def end_game(self, channel_id):
+    async def end_session(self, channel_id):
         async with self._lock:
             if channel_id in self.active_sessions:
                 del self.active_sessions[channel_id]
 
-    def get_game(self, channel_id):
+    def get_session(self, channel_id):
         return self.active_sessions.get(channel_id)
