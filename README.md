@@ -15,6 +15,7 @@ A Discord bot for interactive guessing games/quizzes using dropdowns. Players ca
 | `/create_guess` | Creates a guess dropdown for players to select their answer. |
 | `/scoreboard` | Shows the current scoreboard. |
 | `/increase_score <user> <points>` | Increases a player's score by the specified points. |
+| `/change_score <user> <points>` | Change a player's score to some amount of points. |
 | `/change_options <choices>` | Change the dropdown options (comma-separated). |
 | `/end` | Ends the active scoring session in the current channel. |
 
