@@ -101,3 +101,17 @@ class dropdownGuessCog(commands.Cog):
         
         options = [x.strip() for x in choices.split(",")]
         session.options = options
+
+    @nextcord.slash_command(name="end", description="Ends the active scoring session in the current channel.")
+    async def end(self, interaction: Interaction):
+        session: GuessSession = self.state_manager.get_game(interaction.channel.id)
+        if(session is None):
+            await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
+            return
+        if(interaction.user.id != session.owner_id):
+            await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
+            return
+        
+        self.start_session.end_session(interaction.channel.id)
+        await interaction.response.send_message("Session Ended.", ephemeral=True)
+        
