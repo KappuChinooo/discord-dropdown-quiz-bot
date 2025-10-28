@@ -7,7 +7,7 @@ from state import ChannelStateManager
 
 load_dotenv()
 
-TOKEN = os.getenv("TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_IDS = [int(x) for x in os.getenv("GUILD_IDS", "").split(",") if x]
 PREFIX = set([x for x in os.getenv("PREFIX", "!").split(",") if x])
 

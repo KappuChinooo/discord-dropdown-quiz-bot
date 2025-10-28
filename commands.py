@@ -88,3 +88,16 @@ class dropdownGuessCog(commands.Cog):
 
         await session.increase_score(user.id, points)
         await interaction.response.send_message("Score increased.", ephemeral=True)
+
+    @nextcord.slash_command(name="change_options", description="Change list of option for dropdowns. (comma split)")
+    async def change_options(self, interaction: Interaction, choices: str):
+        session: GuessSession = self.state_manager.get_game(interaction.channel.id)
+        if(session is None):
+            await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
+            return
+        if(interaction.user.id != session.owner_id):
+            await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
+            return
+        
+        options = [x.strip() for x in choices.split(",")]
+        session.options = options
