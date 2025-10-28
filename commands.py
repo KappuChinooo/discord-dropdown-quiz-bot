@@ -21,6 +21,7 @@ class dropdownGuessCog(commands.Cog):
             return
         await self.state_manager.start_session(channel_id, owner)
         await interaction.response.send_message("Session started.", ephemeral=True)
+        print(f"session started in {channel_id}")
 
     @nextcord.slash_command(name="create_guess", description="Creates a guess dropdown.")
     async def create_guess(self,
@@ -38,12 +39,13 @@ class dropdownGuessCog(commands.Cog):
         embed = make_guess_embed()
         view = GuessingView(session, entry)
         await interaction.response.send_message(embed=embed, view=view)
+        print(f"guess created in {interaction.channel.id}")
         message = await interaction.original_message()
         session.entries[message.id] = entry
 
 
     @nextcord.message_command(name="Score this entry")
-    async def do_something_with_message(self, interaction: nextcord.Interaction, message: nextcord.Message):
+    async def score_entry(self, interaction: nextcord.Interaction, message: nextcord.Message):
         session = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
@@ -54,7 +56,7 @@ class dropdownGuessCog(commands.Cog):
         
         await interaction.response.defer()
         message_id = message.id
-        entry = session.find_entry(message_id)
+        entry = await session.find_entry(message_id)
         view = SelectAnswerView(entry)
         await interaction.followup.send(view=view, ephemeral=True)
         await view.wait()
@@ -62,6 +64,7 @@ class dropdownGuessCog(commands.Cog):
             await interaction.followup.send("You didn’t select an answer in time.", ephemeral=True)
             return
         await session.score_guesses(entry, correct=view.value)
+        print(f"{interaction.channel.id}: scored {message_id}")
         await interaction.followup.send("Points scored.", ephemeral=True)
 
     @nextcord.slash_command(name="scoreboard", description="Sends currenct scoreboard")
@@ -101,6 +104,7 @@ class dropdownGuessCog(commands.Cog):
         
         options = [x.strip() for x in choices.split(",")]
         session.options = options
+        print(f"{interaction.channel.id}: Options changed to {options}")
         await interaction.response.send_message("Options changed.", ephemeral=True)
 
 
@@ -116,4 +120,5 @@ class dropdownGuessCog(commands.Cog):
         
         self.start_session.end_session(interaction.channel.id)
         await interaction.response.send_message("Session Ended.", ephemeral=True)
+        print(f"ended session in {interaction.channel.id}")
         

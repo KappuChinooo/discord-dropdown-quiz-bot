@@ -25,15 +25,16 @@ class GuessingView(ui.View):
         async def callback(self, interaction: Interaction):
             player_id = interaction.user.id
             player_name = interaction.user.name
-            owner_guess = self.values[0]
+            guess = self.values[0]
 
             if(player_id not in self.session.players):
                 self.session.players[player_id] = models.Player(player_name)
-            self.entry.guesses[player_id] = owner_guess
+            self.entry.guesses[player_id] = guess
+            print(f"{interaction.channel.id}: {player_name} - {guess}")
 
 class SelectAnswerView(ui.View):
     def __init__(self, entry: models.Entry):
-        super().__init__("Select Correct Answer", timeout=60)
+        super().__init__(timeout=60)
         self.value = None
         self.add_item(self.AnswerChoice(entry))
 
@@ -43,6 +44,7 @@ class SelectAnswerView(ui.View):
 
             async def callback(self, interaction: Interaction):
                 self.view.value = self.values[0]
+                print(f"{self.view.value} selected as correct")
                 self.view.stop()
 
 def make_score_embed(score_list: list[models.Player]):
