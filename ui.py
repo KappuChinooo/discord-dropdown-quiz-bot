@@ -1,16 +1,19 @@
 from nextcord import ui, Interaction, SelectOption, Embed
 import models
+from guess_session import GuessSession
 
 COLOR = 0x2ab4f2
 
 class GuessingView(ui.View):
-    def __init__(self, entry: models.Entry):
+    def __init__(self, session, entry: models.Entry):
         super().__init__(timeout=None)
         self.add_item(self.GuessDropdown(entry, entry.options))
+        self.session = session
         self.entry = entry
 
     class GuessDropdown(ui.Select): 
-        def __init__(self, entry, options_list):
+        def __init__(self, session, entry, options_list):
+            self.session: GuessSession = session
             self.entry: models.Entry = entry
             options = [
                 SelectOption(label=f"{item}", value=str(item))
@@ -24,6 +27,8 @@ class GuessingView(ui.View):
             player_name = interaction.user.name
             owner_guess = int(self.values[0])
 
+            if(player_id not in self.session.players):
+                self.session.players[player_id] = models.Player(player_name)
             self.entry.guesses[player_id] = owner_guess
 
 class SelectAnswerView(ui.View):

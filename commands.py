@@ -36,7 +36,7 @@ class dropdownGuessCog(commands.Cog):
         entry = models.Entry(session.options)
 
         embed = make_guess_embed()
-        view = SelectAnswerView(entry)
+        view = SelectAnswerView(session, entry)
         await interaction.response.send_message(embed=embed, view=view)
         message = interaction.original_message()
         session.entries[message.id] = entry
@@ -85,5 +85,6 @@ class dropdownGuessCog(commands.Cog):
         if(interaction.user.id != session.owner_id):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
-    
+
         await session.increase_score(user.id, points)
+        await interaction.response.send_message("Score increased.", ephemeral=True)
