@@ -8,15 +8,15 @@ class ChannelStateManager:
 
     async def start_session(self, channel_id, owner_id):
         async with self._lock:
-            if channel_id in self.active_games:
+            if(channel_id in self.active_session):
                 raise ValueError("Channel already has an active game.")
             game = GuessSession(owner_id)
-            self.active_games[channel_id] = game
+            self.active_session[channel_id] = game
             return game
         
     async def end_session(self, channel_id):
         async with self._lock:
-            if channel_id in self.active_sessions:
+            if(channel_id in self.active_sessions):
                 del self.active_sessions[channel_id]
 
     def get_session(self, channel_id):
