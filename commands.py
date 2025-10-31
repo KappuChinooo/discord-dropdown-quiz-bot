@@ -105,8 +105,11 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
 
-        await session.increase_score(player.id, points)
-        await interaction.response.send_message("Score increased.", ephemeral=True)
+        result = await session.increase_score(player.id, points)
+        if(result is None):
+            await interaction.response.send_message("Player doesn't exist.", ephemeral=True)
+            return
+        await interaction.response.send_message(f"Score increased. **{result.name}** :{result.score}", ephemeral=True)
 
     @nextcord.slash_command(name="change_score", description="Change score of player to some points")
     async def change_score(self, 
@@ -121,8 +124,11 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
 
-        await session.change_score(player.id, points)
-        await interaction.response.send_message("Score changed.", ephemeral=True)
+        result = await session.change_score(player.id, points)
+        if(result is None):
+            await interaction.response.send_message("Player doesn't exist.", ephemeral=True)
+            return
+        await interaction.response.send_message("Score changed. **{result.name}** :{result.score}", ephemeral=True)
 
     @nextcord.slash_command(name="increment_score", description="Increase score of a player by 1")
     async def increment_score(self, 
@@ -136,8 +142,11 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
 
-        await session.increase_score(player.id, 1)
-        await interaction.response.send_message("Score incremented.", ephemeral=True)
+        result = await session.increase_score(player.id, 1)
+        if(result is None):
+            await interaction.response.send_message("Player doesn't exist.", ephemeral=True)
+            return
+        await interaction.response.send_message("Score incremented. **{result.name}** :{result.score}", ephemeral=True)
 
     @nextcord.slash_command(name="decrement_score", description="Decrease score of a player by 1")
     async def decrement_score(self, 
@@ -151,8 +160,11 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
 
-        await session.increase_score(player.id, -1)
-        await interaction.response.send_message("Score decremented.", ephemeral=True)
+        result = await session.increase_score(player.id, -1)
+        if(result is None):
+            await interaction.response.send_message("Player doesn't exist.", ephemeral=True)
+            return
+        await interaction.response.send_message("Score decremented. **{result.name}** :{result.score}", ephemeral=True)
 
     @nextcord.slash_command(name="change_options", description="Change list of option for dropdowns")
     async def change_options(self, 

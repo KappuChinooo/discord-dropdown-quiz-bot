@@ -23,14 +23,16 @@ class GuessSession:
             try:
                 self.players[player].score += points
             except:
-                pass
+                return None
+            return self.players[player]
 
     async def change_score(self, player, points):
         async with self._lock:
             try:
                 self.players[player].score = points
             except:
-                pass
+                return None
+            return self.players[player]
 
     async def get_score(self):
         async with self._lock:
