@@ -22,7 +22,7 @@ bot.add_cog(dropdownGuessCog(bot, state_manager))
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as: {bot.user}")
+    print(f"logged in as: {bot.user}")
     for guild_id in GUILD_IDS:
         await bot.sync_application_commands(guild_id=guild_id)
         print(f"synced {guild_id}")

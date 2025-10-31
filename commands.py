@@ -40,7 +40,7 @@ class dropdownGuessCog(commands.Cog):
         embed = make_guess_embed(title=title)
         view = GuessingView(session, entry)
         await interaction.response.send_message(embed=embed, view=view)
-        print(f"guess created in {interaction.channel.id}")
+        print(f"{interaction.channel.id}: guess dropdown created")
         message = await interaction.original_message()
         session.entries[message.id] = entry
 
@@ -58,7 +58,7 @@ class dropdownGuessCog(commands.Cog):
         message_id = message.id
         entry = await session.find_entry(message_id)
         if(entry is None):
-            await interaction.response.send_message("Message is not a guess entry.", ephemeral=True)
+            await interaction.response.send_message("Message is not a guess dropdown.", ephemeral=True)
             return
         view = SelectAnswerView(entry)
         embed = make_answer_select_embed()
@@ -109,6 +109,7 @@ class dropdownGuessCog(commands.Cog):
         if(result is None):
             await interaction.response.send_message("Player already exists.", ephemeral=True)
             return
+        print(f"{interaction.channel_id}: player {result.name} added")
         await interaction.response.send_message(f"Player **{result.name}** added.", ephemeral=True)
 
     @nextcord.slash_command(name="increase_score", description="Increase score of player by some points")
@@ -128,7 +129,8 @@ class dropdownGuessCog(commands.Cog):
         if(result is None):
             await interaction.response.send_message("Player doesn't exist.", ephemeral=True)
             return
-        await interaction.response.send_message(f"Score increased. **{result.name}** :{result.score}", ephemeral=True)
+        print(f"{interaction.channel_id}: {result.name} score increased by {points} to {result.score}")
+        await interaction.response.send_message(f"Score increased. **{result.name}** : **{result.score}**", ephemeral=True)
 
     @nextcord.slash_command(name="change_score", description="Change score of player to some points")
     async def change_score(self, 
@@ -147,7 +149,8 @@ class dropdownGuessCog(commands.Cog):
         if(result is None):
             await interaction.response.send_message("Player doesn't exist.", ephemeral=True)
             return
-        await interaction.response.send_message("Score changed. **{result.name}** :{result.score}", ephemeral=True)
+        print(f"{interaction.channel_id}: {result.name} score changed to {result.score}")
+        await interaction.response.send_message(f"Score changed. **{result.name}** : **{result.score}**", ephemeral=True)
 
     @nextcord.slash_command(name="increment_score", description="Increase score of a player by 1")
     async def increment_score(self, 
@@ -165,7 +168,8 @@ class dropdownGuessCog(commands.Cog):
         if(result is None):
             await interaction.response.send_message("Player doesn't exist.", ephemeral=True)
             return
-        await interaction.response.send_message("Score incremented. **{result.name}** :{result.score}", ephemeral=True)
+        print(f"{interaction.channel_id}: {result.name} score incremented, now {result.score}")
+        await interaction.response.send_message(f"Score incremented. **{result.name}** : **{result.score}**", ephemeral=True)
 
     @nextcord.slash_command(name="decrement_score", description="Decrease score of a player by 1")
     async def decrement_score(self, 
@@ -183,7 +187,8 @@ class dropdownGuessCog(commands.Cog):
         if(result is None):
             await interaction.response.send_message("Player doesn't exist.", ephemeral=True)
             return
-        await interaction.response.send_message("Score decremented. **{result.name}** :{result.score}", ephemeral=True)
+        print(f"{interaction.channel_id}: {result.name} score decremented, now {result.score}")
+        await interaction.response.send_message(f"Score decremented. **{result.name}** : **{result.score}**", ephemeral=True)
 
     @nextcord.slash_command(name="change_options", description="Change list of option for dropdowns")
     async def change_options(self, 
@@ -201,7 +206,7 @@ class dropdownGuessCog(commands.Cog):
         result = await session.change_options(options)
         if(result is None):
             await interaction.response.send_message("Options can not be nothing.", ephemeral=True)
-        print(f"{interaction.channel.id}: Options changed to {options}")
+        print(f"{interaction.channel.id}: options changed to {options}")
         await interaction.response.send_message(f"Options changed to **{", ".join(options)}**.", ephemeral=True)
 
 
@@ -217,5 +222,5 @@ class dropdownGuessCog(commands.Cog):
         
         self.start_session.end_session(interaction.channel.id)
         await interaction.response.send_message("Session Ended.", ephemeral=True)
-        print(f"ended session in {interaction.channel.id}")
+        print(f"session ended in {interaction.channel.id}")
         
