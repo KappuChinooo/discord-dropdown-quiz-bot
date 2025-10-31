@@ -220,7 +220,7 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
         
-        self.start_session.end_session(interaction.channel.id)
+        await self.state_manager.end_session(interaction.channel.id)
         await interaction.response.send_message("Session Ended.", ephemeral=True)
         print(f"session ended in {interaction.channel.id}")
         
