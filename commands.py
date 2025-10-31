@@ -57,6 +57,9 @@ class dropdownGuessCog(commands.Cog):
         
         message_id = message.id
         entry = await session.find_entry(message_id)
+        if(entry is None):
+            await interaction.response.send_message("Message is not a guess entry.", ephemeral=True)
+            return
         view = SelectAnswerView(entry)
         embed = make_answer_select_embed()
         await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
