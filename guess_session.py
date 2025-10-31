@@ -17,6 +17,7 @@ class GuessSession:
                         self.players[guesser].score += 1
                     except:
                         pass
+        return True
 
     async def increase_score(self, player, points):
         async with self._lock:
@@ -43,3 +44,17 @@ class GuessSession:
     async def find_entry(self, message_id):
         async with self._lock:
             return self.entries.get(message_id)
+        
+    async def add_player(self, id, name, score = 0):
+        if(id in self.players):
+            return None
+        async with self._lock:
+            self.players[id] = models.Player(name, score)
+        return self.players[id]
+
+    async def change_options(self, options):
+        if(options is None):
+            return None
+        async with self._lock:
+            self.options = options
+        return True

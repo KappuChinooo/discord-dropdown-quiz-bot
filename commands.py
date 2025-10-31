@@ -92,6 +92,25 @@ class dropdownGuessCog(commands.Cog):
         embed = make_score_embed(scores)
         await interaction.response.send_message(embed=embed)
 
+    @nextcord.slash_command(name="add_player", description="Manually add a player into the session")
+    async def add_player(self, 
+                             interaction: Interaction, 
+                             player: nextcord.User = SlashOption(description="Player to add", required=True), 
+                             score: int = SlashOption(description="Points to give", required=False, default=0)):
+        session: GuessSession = self.state_manager.get_session(interaction.channel.id)
+        if(session is None):
+            await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
+            return
+        if(interaction.user.id != session.owner_id):
+            await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
+            return
+
+        result = await session.add_player(player.id, player.name, score)
+        if(result is None):
+            await interaction.response.send_message("Player already exists.", ephemeral=True)
+            return
+        await interaction.response.send_message(f"Player **{result.name}** added.", ephemeral=True)
+
     @nextcord.slash_command(name="increase_score", description="Increase score of player by some points")
     async def increase_score(self, 
                              interaction: Interaction, 
@@ -179,9 +198,11 @@ class dropdownGuessCog(commands.Cog):
             return
         
         options = [x.strip() for x in choices.split(",")]
-        session.options = options
+        result = await session.change_options(options)
+        if(result is None):
+            await interaction.response.send_message("Options can not be nothing.", ephemeral=True)
         print(f"{interaction.channel.id}: Options changed to {options}")
-        await interaction.response.send_message("Options changed.", ephemeral=True)
+        await interaction.response.send_message(f"Options changed to **{", ".join(options)}**.", ephemeral=True)
 
 
     @nextcord.slash_command(name="end", description="Ends the active scoring session in the current channel")
