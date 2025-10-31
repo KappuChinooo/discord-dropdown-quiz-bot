@@ -8,15 +8,17 @@ class GuessSession:
         self.players: dict[int, models.Player] = {}
         self.entries: dict[int, models.Entry] = {}
         self._lock = asyncio.Lock()
+        self.multiple_guesses = False
 
     async def score_guesses(self, entry: models.Entry, correct):
         async with self._lock:
-            for guesser, guess in entry.guesses.items():
-                if(guess in correct):
-                    try:
-                        self.players[guesser].score += 1
-                    except:
-                        pass
+            for guesser, guesses in entry.guesses.items():
+                for guess in guesses:
+                    if(guess in correct):
+                        try:
+                            self.players[guesser].score += 1
+                        except:
+                            pass
         return True
 
     async def increase_score(self, player, points):
@@ -58,3 +60,7 @@ class GuessSession:
         async with self._lock:
             self.options = options
         return True
+    
+    async def set_multiple_guesses(self, multiple: bool):
+        async with self._lock:
+            self.multiple_guesses = multiple

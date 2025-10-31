@@ -202,7 +202,7 @@ class dropdownGuessCog(commands.Cog):
             await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
             return
         
-        options = [x.strip() for x in choices.split(",")]
+        options = list(set([x.strip() for x in choices.split(",") if x.strip()]))
         result = await session.change_options(options)
         if(result is None):
             await interaction.response.send_message("Options can not be nothing.", ephemeral=True)
@@ -224,3 +224,19 @@ class dropdownGuessCog(commands.Cog):
         await interaction.response.send_message("Session Ended.", ephemeral=True)
         print(f"session ended in {interaction.channel.id}")
         
+    @nextcord.slash_command(name="toggle_multiple_guesses", description="Toggles whether multiple guesses should be on or off.")
+    async def toggle_multiple_guesses(self, 
+                                      interaction: Interaction):
+        session: GuessSession = self.state_manager.get_session(interaction.channel.id)
+        if(session is None):
+            await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
+            return
+        if(interaction.user.id != session.owner_id):
+            await interaction.response.send_message("You are not the owner of the channel's session.", ephemeral=True)
+            return
+        
+        if(session.multiple_guesses == True):
+            await session.set_multiple_guesses(False)
+        else:
+            await session.set_multiple_guesses(True)
+        await interaction.response.send_message(f"Multiple guesses set to {session.multiple_guesses}.")
