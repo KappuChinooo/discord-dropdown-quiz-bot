@@ -26,7 +26,8 @@ class dropdownGuessCog(commands.Cog):
     @nextcord.slash_command(name="create_guess", description="Creates a guess dropdown")
     async def create_guess(self,
                      interaction: Interaction,
-                     title: str = SlashOption(description="Guess embed title", required=False, default=None) ):
+                     title: str = SlashOption(description="Guess embed title", required=False, default=None),
+                     max_guesses: int = SlashOption(description="Max number of guesses for this guess entry", required = False, default=None)):
         session: GuessSession = self.state_manager.get_session(interaction.channel.id)
         if(session is None):
             await interaction.response.send_message("This channel does not have an active session.", ephemeral=True)
@@ -38,7 +39,7 @@ class dropdownGuessCog(commands.Cog):
         entry = models.Entry(session.options)
 
         embed = make_guess_embed(title=title)
-        view = GuessingView(session, entry)
+        view = GuessingView(session, entry, max_guesses)
         await interaction.response.send_message(embed=embed, view=view)
         print(f"{interaction.channel.id}: guess dropdown created")
         message = await interaction.original_message()

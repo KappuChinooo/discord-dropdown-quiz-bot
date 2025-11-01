@@ -5,22 +5,25 @@ from guess_session import GuessSession
 COLOR = 0x2ab4f2
 
 class GuessingView(ui.View):
-    def __init__(self, session, entry: models.Entry):
+    def __init__(self, session, entry: models.Entry, max_guesses = None):
         super().__init__(timeout=None)
-        self.session = session
-        self.entry = entry
-        self.add_item(self.GuessDropdown(session, entry, entry.options))
+        self.add_item(self.GuessDropdown(session, entry, entry.options, max_guesses))
 
     class GuessDropdown(ui.Select): 
-        def __init__(self, session, entry, options_list):
+        def __init__(self, session, entry, options_list, max_guesses):
             self.session: GuessSession = session
             self.entry: models.Entry = entry
             options = [
                 SelectOption(label=f"{item}", value=str(item))
                 for item in options_list
             ]
-
-            super().__init__(placeholder="Guess the owner...", min_values=1, max_values=(len(options_list) if self.session.multiple_guesses else 1), options=options)
+            if max_guesses is not None:
+                max_values = max_guesses
+            elif self.session.multiple_guesses:
+                max_values = len(options_list)
+            else:
+                max_values = 1
+            super().__init__(placeholder="Guess the owner...", min_values=1, max_values=max_values, options=options)
 
         async def callback(self, interaction: Interaction):
             player_id = interaction.user.id
@@ -30,10 +33,10 @@ class GuessingView(ui.View):
             if(player_id not in self.session.players):
                 await self.session.add_player(player_id, player_name)
             self.entry.guesses[player_id] = guess
-            print(f"{interaction.channel.id}: {player_name} - {", ".join(guess)}")
+            print(f"{interaction.channel.id}: {player_name} - {', '.join(guess)}")
             names = [self.session.players[id].name for id in self.entry.guesses.keys()]
             message = interaction.message
-            title = message.embeds[0].title
+            title = message.embeds[0].title if message.embeds else "Select the correct answer"
             embed = make_guess_embed(guessed_list=names, title=title)
             await interaction.response.edit_message(embed=embed)
 
